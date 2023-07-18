@@ -1,8 +1,11 @@
 import express from "express"
+import morgan from "morgan"
 
 import "dotenv/config"
 
 const app = express()
+
+app.use(morgan("tiny"))
 
 app.get("/", (_req, res) => {
     res.json({
@@ -13,5 +16,7 @@ app.get("/", (_req, res) => {
 const port = process.env["PORT"]
 
 app.listen(port, () => {
-    console.log(`Listening on port http://localhost:${port}`)
+    if (process.env["NODE_ENV"] === "dev") {
+        console.log(`Listening on port http://localhost:${port}`)
+    }
 })
