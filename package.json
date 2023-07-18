@@ -1,0 +1,32 @@
+{
+    "name": "stuck-overflow",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/app.js",
+    "type": "module",
+    "scripts": {
+        "build": "tsc",
+        "clean": "rimraf dist",
+        "dev": "concurrently \"tsc -w\" \"nodemon dist/app.js\" -w dist",
+        "run": "node dist/app.js",
+        "prebuild": "npm run clean",
+        "predev": "npm run build",
+        "prerun": "npm run build",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/debug": "^4.1.8",
+        "@types/express": "^4.17.17",
+        "@types/node": "^20.4.2",
+        "concurrently": "^8.2.0",
+        "rimraf": "^5.0.1",
+        "typescript": "^5.1.6"
+    },
+    "dependencies": {
+        "debug": "^4.3.4",
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2"
+    }
+}
