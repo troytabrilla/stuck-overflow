@@ -1,0 +1,20 @@
+version: '3'
+
+# @see https://github.com/felipewom/docker-compose-postgres
+services:
+  # api:
+  #   build: .
+  #   ports:
+  #     - 3000:3000
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - db
+  db:
+    image: postgres:15-bullseye
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+    volumes:
+      - ./db-data/:/var/lib/postgresql/data/

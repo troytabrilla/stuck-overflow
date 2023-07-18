@@ -7,7 +7,7 @@
     "scripts": {
         "build": "tsc",
         "clean": "rimraf dist",
-        "dev": "concurrently \"tsc -w\" \"nodemon dist/app.js\" -w dist",
+        "dev": "concurrently \"tsc -w\" \"nodemon -r dotenv/config dist/app.js\" -w dist",
         "start": "node dist/app.js",
         "prebuild": "npm run clean",
         "predev": "npm run build",
