@@ -1,7 +1,11 @@
 import joi from "joi"
 
 import validate from "./lib/validate.js"
+import postgres from "../db/postgres.js"
 import User, { validator as userValidator } from "./user.js"
+import fetchCommentsForEntity from "../queries/fetch-comments-for-entity.js"
+
+import type { CommentEntities } from "../queries/fetch-comments-for-entity.js"
 
 interface IComment {
     id: number
@@ -55,6 +59,23 @@ class Comment implements IComment {
 
         const validated = Comment.validate(comment)
         return new Comment(validated)
+    }
+
+    static async fetchAllForEntity(
+        entityName: CommentEntities,
+        entityId: number
+    ) {
+        const results = await postgres.pool.query(
+            fetchCommentsForEntity(entityName, entityId).toString()
+        )
+
+        if (results?.rows?.length > 0) {
+            return results.rows.map((comment: IComment) =>
+                Comment.build(comment)
+            )
+        }
+
+        return []
     }
 }
 

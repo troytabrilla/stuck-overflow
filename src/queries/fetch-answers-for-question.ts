@@ -1,11 +1,11 @@
 import builder from "./lib/builder.js"
 import joinUsers from "./lib/join-users.js"
 
-const fetchAnswersForQuestions = (question_id: number) => {
+const fetchAnswersForQuestions = (questionId: number) => {
     let query = builder
         .select("answers.*")
         .from("answers")
-        .where("answers.question_id", question_id)
+        .where("answers.question_id", questionId)
         .groupBy("answers.id")
 
     query = joinUsers(query, "answers")

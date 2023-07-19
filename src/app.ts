@@ -3,7 +3,7 @@ import helmet from "helmet"
 import morgan from "morgan"
 
 import router from "./router.js"
-import catchAllErrorHandler from "./controllers/lib/catch-all-error-handler.js"
+import apiErrorHandler from "./controllers/lib/api-error-handler.js"
 
 const app = express()
 
@@ -12,7 +12,7 @@ app.use(morgan("tiny"))
 
 app.use("/api/v1", router)
 
-app.use(catchAllErrorHandler)
+app.use(apiErrorHandler)
 
 const port = process.env["PORT"]
 
