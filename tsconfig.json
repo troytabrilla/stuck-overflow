@@ -11,10 +11,8 @@
         "strict": true,
 
         /* Modules */
-        "paths": {
-            "#pkg/*": ["./src/*"]
-        },
         "types": [],
+        "moduleResolution": "node",
 
         /* Emit */
         "declaration": true,
@@ -29,7 +27,7 @@
         "verbatimModuleSyntax": true,
 
         /* Language and Environment */
-        "target": "ES2017",
+        "target": "ES6",
 
         /* Projects */
         "incremental": true,
@@ -38,5 +36,5 @@
         "skipLibCheck": true
     },
     "include": ["src/**/*"],
-    "exclude": ["**/node_modules"]
+    "exclude": ["**/node_modules", "dist", "db-data"]
 }
