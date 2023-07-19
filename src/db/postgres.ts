@@ -1,5 +1,7 @@
 import pg from "pg"
 
+// @note Ideally, all postgres queries should use a shared connection pool to improve performance and save resources,
+// so I decided to encapsulate that here, as a sort of singleton.
 const config = {
     host: process.env["POSTGRES_HOST"],
     user: process.env["POSTGRES_USER"],

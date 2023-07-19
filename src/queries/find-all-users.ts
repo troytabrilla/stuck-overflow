@@ -1,6 +1,4 @@
-import knex from "knex"
-
-const builder = knex({ client: "pg" })
+import builder from "./lib/builder.js"
 
 const findAllUsers = () => {
     return builder.select("*").from("users").toString()

@@ -1,6 +1,9 @@
 version: '3'
 
-# @see https://github.com/felipewom/docker-compose-postgres
+# @note Needed another .env.docker file to change localhost to host.docker.internal, so this may
+# be annoying to manage in production. Could try to generate the .env files in a deployment
+# script, instead, but I felt that was out of scope for this challenge.
+# @see https://laurent-bel.medium.com/waiting-for-postgresql-to-start-in-docker-compose-c72271b3c74a
 services:
   api:
     build: .
@@ -9,7 +12,9 @@ services:
     env_file:
       - .env.docker
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+  # @see https://github.com/felipewom/docker-compose-postgres
   db:
     image: postgres:15-bullseye
     ports:
@@ -18,3 +23,23 @@ services:
       - .env.docker
     volumes:
       - ./db-data/:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  # @see https://stackoverflow.com/questions/60834472/run-postgres-migration-with-docker-docker-compose
+  migration:
+    build:
+      context: .
+    command:
+      [
+        "npm",
+        "run",
+        "setup-db"
+      ]
+    env_file:
+      - .env.docker
+    depends_on:
+      db:
+        condition: service_healthy

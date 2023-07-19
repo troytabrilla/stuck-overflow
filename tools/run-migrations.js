@@ -6,6 +6,10 @@ import { pool } from "../dist/db/postgres.js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+// @note These migration/seeding tools are written in JavaScript so they can be run in npm scripts
+// without having to be compiled. They exist outside of the src directory because they're not meant
+// to be included in the application. There may be a more elegant way to handle this with compiler
+// options, but I just went with this to save time for other functionality.
 const migrate = async (path) => {
     const client = await pool.connect()
 
@@ -16,6 +20,8 @@ const migrate = async (path) => {
     }
 }
 
+// @note For production, it'd be prudent to have better logging for failures, especially if these
+// migrations are handled during CI/CD.
 migrate(path.join(__dirname, "..", "migrations"))
     .then(() => {
         console.log("Finished migrations.")
