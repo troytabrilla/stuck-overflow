@@ -1,13 +1,15 @@
 import joi from "joi"
 
 import validate from "./lib/validate.js"
+import postgres from "../db/postgres.js"
+import fetchAllUsers from "../queries/fetch-all-users.js"
 
 interface IUser {
     id: number
     name: string
 }
 
-const validator = joi.object<IUser>({
+export const validator = joi.object<IUser>({
     id: joi.number().required(),
     name: joi.string().min(2).max(100).required(),
 })
@@ -32,6 +34,16 @@ class User implements IUser {
     static build(user: IUser) {
         const validated = User.validate(user)
         return new User(validated)
+    }
+
+    static async fetchAll() {
+        const results = await postgres.pool.query(fetchAllUsers().toString())
+
+        if (results?.rows?.length > 0) {
+            return results.rows.map((user: IUser) => User.build(user))
+        }
+
+        return []
     }
 }
 
