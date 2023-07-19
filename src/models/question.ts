@@ -4,9 +4,6 @@ import validate from "./lib/validate.js"
 import postgres from "../db/postgres.js"
 import fetchQuestion from "../queries/fetch-question.js"
 import User, { validator as userValidator } from "./user.js"
-import Answer, { validator as answerValidator } from "./answer.js"
-
-import type { QuestionInclude } from "../queries/fetch-question.js"
 
 interface IQuestion {
     id: number
@@ -16,7 +13,6 @@ interface IQuestion {
     creation: Date
     user_id: number
     user?: User | undefined
-    answers?: Answer[] | undefined
 }
 
 const validator = joi.object<IQuestion>({
@@ -27,7 +23,6 @@ const validator = joi.object<IQuestion>({
     creation: joi.date().required(),
     user_id: joi.number().min(0).required(),
     user: userValidator,
-    answers: joi.array().items(answerValidator),
 })
 
 // @note I chose to use classes to model the given data. The main reason was to encapsulate common methods like
@@ -44,7 +39,6 @@ class Question implements IQuestion {
     creation: Date
     user_id: number
     user?: User | undefined
-    answers?: Answer[] | undefined
 
     constructor(question: IQuestion) {
         this.id = question.id
@@ -54,7 +48,6 @@ class Question implements IQuestion {
         this.creation = question.creation
         this.user_id = question.user_id
         this.user = question.user
-        this.answers = question.answers
     }
 
     static validate(question: IQuestion) {
@@ -62,11 +55,7 @@ class Question implements IQuestion {
     }
 
     static build(question: IQuestion) {
-        if (question.answers) {
-            question.answers = question.answers.map(Answer.build)
-        }
-
-        if (question.user) {
+        if (typeof question.user === "object") {
             question.user = User.build(question.user)
         }
 
@@ -74,10 +63,8 @@ class Question implements IQuestion {
         return new Question(validated)
     }
 
-    static async fetch(id: number, include?: QuestionInclude[]) {
-        const results = await postgres.pool.query(
-            fetchQuestion(id, include).toString()
-        )
+    static async fetch(id: number) {
+        const results = await postgres.pool.query(fetchQuestion(id).toString())
 
         if (results?.rows[0]) {
             return Question.build(results.rows[0])

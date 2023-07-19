@@ -1,11 +1,13 @@
 import joi from "joi"
 
 import validate from "./lib/validate.js"
+import User, { validator as userValidator } from "./user.js"
 
 interface IComment {
     id: number
     body: string
     user_id: number
+    user?: User | undefined
 }
 
 // @note Comments can belong to either a question or an answer, but not both at the same time.
@@ -26,17 +28,20 @@ export const validator = joi.object<IComment>({
     id: joi.number().required(),
     body: joi.string().min(2).max(5000).required(),
     user_id: joi.number().min(0).required(),
+    user: userValidator,
 })
 
 class Comment implements IComment {
     id: number
     body: string
     user_id: number
+    user?: User | undefined
 
     constructor(comment: IComment) {
         this.id = comment.id
         this.body = comment.body
         this.user_id = comment.user_id
+        this.user = comment.user
     }
 
     static validate(comment: IComment) {
@@ -44,6 +49,10 @@ class Comment implements IComment {
     }
 
     static build(comment: IComment) {
+        if (typeof comment.user === "object") {
+            comment.user = User.build(comment.user)
+        }
+
         const validated = Comment.validate(comment)
         return new Comment(validated)
     }
