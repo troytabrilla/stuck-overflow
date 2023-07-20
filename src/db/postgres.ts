@@ -11,6 +11,7 @@ const config = {
 
 export const pool = new pg.Pool(config)
 
+// @todo Add a query function that parses out rows
 export default {
     pool,
 }

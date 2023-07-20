@@ -89,16 +89,26 @@ class Answer implements IAnswer {
             creation: new Date(),
         }
 
-        const validated = this.validate({ ...defaults, ...answer })
+        let validated: IAnswer
+        try {
+            validated = this.validate({ ...defaults, ...answer })
+        } catch (err) {
+            logger(err)
+            throw new BadRequest("Invalid answer.")
+        }
 
-        const question = fetchQuestion(answer.question_id)
-        if (!question) {
+        const question = await postgres.pool.query(
+            fetchQuestion(answer.question_id).toString()
+        )
+        if (!question?.rows?.length) {
             logger("No question found for answer.")
             throw new BadRequest("No question to answer.")
         }
 
-        const user = fetchUser(answer.user_id)
-        if (!user) {
+        const user = await postgres.pool.query(
+            fetchUser(answer.user_id).toString()
+        )
+        if (!user?.rows?.length) {
             logger("No user found for answer.")
             throw new BadRequest("No user for answer.")
         }
@@ -109,7 +119,10 @@ class Answer implements IAnswer {
 
         logger(results?.rows)
 
-        return validated
+        return {
+            ...validated,
+            id: results?.rows[0]?.id,
+        }
     }
 }
 
