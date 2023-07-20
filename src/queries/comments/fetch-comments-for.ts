@@ -8,15 +8,16 @@ const fetchCommentsFor = (
     entityName: CommentEntities,
     entityIds: number | number[]
 ) => {
+    if (typeof entityIds === "number") {
+        entityIds = [entityIds]
+    }
+
     let query = builder
         .select("comments.*")
         .from("comments")
         .groupBy("comments.id")
 
-    if (typeof entityIds === "number") {
-        entityIds = [entityIds]
-    }
-
+    // Handle joins through junction tables for questions and answers
     switch (entityName) {
         case "questions":
             query

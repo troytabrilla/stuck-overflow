@@ -8,6 +8,7 @@ import Comment from "../models/comment.js"
 import errorHandler from "./lib/error-handler.js"
 import NotFound from "./lib/errors/not-found.js"
 
+// Fetches all questions, answers, and comments for a given user
 export const fetchFull: RequestHandler = errorHandler(async (req, res) => {
     const id = parseId(req)
     const user = await User.fetch(id)

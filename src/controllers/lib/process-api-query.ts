@@ -18,6 +18,7 @@ const exists = (val: any) => {
     return val != null
 }
 
+// Validate common API query parameters, i.e. paging and sorting and return standardized query object
 const processApiQuery = (req: Request, validSortKeys: string[]): ApiQuery => {
     const validator = joi.object({
         limit: joi.number().min(0),
