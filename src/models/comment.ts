@@ -83,12 +83,12 @@ class Comment implements IComment {
     }
 
     static async fetchAllFor(entityName: CommentEntities, entityId: number) {
-        const results = await postgres.pool.query(
+        const results = await postgres.query(
             fetchCommentsFor(entityName, entityId).toString()
         )
 
-        if (results?.rows?.length > 0) {
-            return results.rows.map(Comment.build)
+        if (results.length) {
+            return results.map(Comment.build)
         }
 
         return []
@@ -118,19 +118,19 @@ class Comment implements IComment {
 
         switch (entity.entity_name) {
             case "questions":
-                const question = await postgres.pool.query(
+                const question = await postgres.query(
                     fetchQuestion(entity.entity_id).toString()
                 )
-                if (!question?.rows?.length) {
+                if (!question.length) {
                     logger("No question found for comment.")
                     throw new BadRequest("No question to comment on.")
                 }
                 break
             case "answers":
-                const answer = await postgres.pool.query(
+                const answer = await postgres.query(
                     fetchAnswer(entity.entity_id).toString()
                 )
-                if (!answer?.rows?.length) {
+                if (!answer.length) {
                     logger("No answer found for comment.")
                     throw new BadRequest("No answer to comment on.")
                 }
@@ -140,17 +140,14 @@ class Comment implements IComment {
                 throw new BadRequest("Invalid entity for comments.")
         }
 
-        const user = await postgres.pool.query(
-            fetchUser(comment.user_id).toString()
-        )
-        if (!user?.rows?.length) {
+        const user = await postgres.query(fetchUser(comment.user_id).toString())
+        if (!user.length) {
             logger("No user found for comment.")
             throw new BadRequest("No user for comment.")
         }
 
         const client = await postgres.pool.connect()
         let final: IComment
-
         try {
             await client.query("BEGIN")
             const results = await client.query(

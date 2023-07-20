@@ -11,7 +11,18 @@ const config = {
 
 export const pool = new pg.Pool(config)
 
+export const query = async (queryStr: string) => {
+    const results = await pool.query(queryStr)
+
+    if (results?.rows?.length > 0) {
+        return results.rows
+    }
+
+    return []
+}
+
 // @todo Add a query function that parses out rows
 export default {
     pool,
+    query,
 }

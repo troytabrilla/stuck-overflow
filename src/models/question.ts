@@ -71,44 +71,42 @@ class Question implements IQuestion {
     }
 
     static async fetch(id: number) {
-        const results = await postgres.pool.query(fetchQuestion(id).toString())
+        const results = await postgres.query(fetchQuestion(id).toString())
 
-        if (results?.rows[0]) {
-            return Question.build(results.rows[0])
+        if (results.length) {
+            return Question.build(results[0])
         }
 
         return null
     }
 
     static async fetchAll(paging?: Paging, sorting?: Sorting) {
-        const results = await postgres.pool.query(
+        const results = await postgres.query(
             fetchAllQuestions(paging, sorting).toString()
         )
 
-        if (results?.rows?.length > 0) {
-            return results.rows.map(Question.build)
+        if (results.length) {
+            return results.map(Question.build)
         }
     }
 
     static async countAll() {
-        const results = await postgres.pool.query(
-            countAllQuestions().toString()
-        )
+        const results = await postgres.query(countAllQuestions().toString())
 
-        if (results?.rows?.length > 0) {
-            return results.rows[0].count || 0
+        if (results.length) {
+            return results[0].count || 0
         }
 
         return 0
     }
 
     static async fetchAllFor(entityName: QuestionEntities, entityId: number) {
-        const results = await postgres.pool.query(
+        const results = await postgres.query(
             fetchQuestionsFor(entityName, entityId).toString()
         )
 
-        if (results?.rows?.length > 0) {
-            return results.rows.map(Question.build)
+        if (results.length > 0) {
+            return results.map(Question.build)
         }
 
         return []

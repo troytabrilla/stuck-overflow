@@ -37,10 +37,10 @@ class User implements IUser {
     }
 
     static async fetch(id: number) {
-        const results = await postgres.pool.query(fetchUser(id).toString())
+        const results = await postgres.query(fetchUser(id).toString())
 
-        if (results?.rows[0]) {
-            return User.build(results.rows[0])
+        if (results.length) {
+            return User.build(results[0])
         }
 
         return null

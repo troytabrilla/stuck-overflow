@@ -71,12 +71,12 @@ class Answer implements IAnswer {
     }
 
     static async fetchAllFor(entityName: AnswerEntities, entityId: number) {
-        const results = await postgres.pool.query(
+        const results = await postgres.query(
             fetchAnswersFor(entityName, entityId).toString()
         )
 
-        if (results?.rows?.length > 0) {
-            return results.rows.map(Answer.build)
+        if (results.length) {
+            return results.map(Answer.build)
         }
 
         return []
@@ -97,31 +97,27 @@ class Answer implements IAnswer {
             throw new BadRequest("Invalid answer.")
         }
 
-        const question = await postgres.pool.query(
+        const question = await postgres.query(
             fetchQuestion(answer.question_id).toString()
         )
-        if (!question?.rows?.length) {
+        if (!question.length) {
             logger("No question found for answer.")
             throw new BadRequest("No question to answer.")
         }
 
-        const user = await postgres.pool.query(
-            fetchUser(answer.user_id).toString()
-        )
-        if (!user?.rows?.length) {
+        const user = await postgres.query(fetchUser(answer.user_id).toString())
+        if (!user.length) {
             logger("No user found for answer.")
             throw new BadRequest("No user for answer.")
         }
 
-        const results = await postgres.pool.query(
-            createAnswer(validated).toString()
-        )
+        const results = await postgres.query(createAnswer(validated).toString())
 
-        logger(results?.rows)
+        logger(results)
 
         return {
             ...validated,
-            id: results?.rows[0]?.id,
+            id: results[0]?.id,
         }
     }
 }
