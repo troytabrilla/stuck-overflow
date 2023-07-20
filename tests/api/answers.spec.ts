@@ -2,10 +2,10 @@ import { test, expect } from "@playwright/test"
 
 // @note I chose to use Playwright as the test runner for convenience. I could develop and run both unit and
 // integration tests in the same framework, which is pretty nice. Anything that makes writing and running
-// tests easier is a win in my book. This test suite is not necessarily exhaustive for this challenge, but I
-// wanted to try to handle the usual suspects, like invalid inputs. For production, I would probably try to
-// include more edge cases, if possible. I'd also try to work with QA to see if they had any test cases they
-// regularly ran that they'd like to see automated.
+// tests easier is a win in my book. This test suite doesn't try to go for full coverage, because that would
+// take a ton of time, but I  wanted to try to handle the usual suspects, like invalid inputs at least. For a
+// production app, I'd try to be more thorough. I'd also try to work with QA to see if they had any test cases
+// they regularly ran that they'd like to see automated.
 
 test("create - success", async ({ request }) => {
     const data = {

@@ -36,7 +36,7 @@ class User implements IUser {
             return validate(user, validator)
         } catch (err) {
             logger(err)
-            throw new BadRequest("Invalid question.")
+            throw new BadRequest("Invalid user.")
         }
     }
 

@@ -100,7 +100,11 @@ class Question implements IQuestion {
     static async countAll() {
         const results = await postgres.query(countAllQuestions().toString())
 
-        return results[0]?.count || 0
+        if (results[0]?.count) {
+            return parseInt(results[0].count, 10)
+        }
+
+        return 0
     }
 
     static async fetchAllFor(entityName: QuestionEntities, entityId: number) {

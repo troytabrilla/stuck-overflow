@@ -19,7 +19,7 @@ export const fetchAll: RequestHandler = errorHandler(async (req, res) => {
         paging: {
             ...query.paging,
             ...query.sorting,
-            total: typeof total === "number" ? total : parseInt(total, 10),
+            total,
         },
     })
 })
