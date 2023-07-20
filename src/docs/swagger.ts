@@ -24,7 +24,7 @@ const spec = swaggerJsDoc(options)
 const docs = (app: Express) => {
     app.use("/api/v1/docs", swaggerUi.serve, swaggerUi.setup(spec))
 
-    app.get("/public/docs.json", (req: Request, res: Response) => {
+    app.get("/api/v1/docs.json", (req: Request, res: Response) => {
         res.setHeader("Content-Type", "application/json")
         res.send(spec)
     })
