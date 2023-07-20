@@ -56,6 +56,33 @@ const entityValidator = joi.object<IEntity>({
     entity_id: joi.number().min(0).required(),
 })
 
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *      CreateCommentInput:
+ *          type: object
+ *          properties:
+ *              body:
+ *                  type: string
+ *                  default: This is a comment.
+ *              user_id:
+ *                  type: integer
+ *                  default: 14531062
+ *              entity_name:
+ *                  type: string
+ *                  enum:
+ *                      - questions
+ *                      - answers
+ *              entity_id:
+ *                  type: integer
+ *                  default: 68462550
+ *          required:
+ *              - body
+ *              - user_id
+ *              - entity_name
+ *              - entity_id
+ */
 class Comment implements IComment {
     id: number
     body: string

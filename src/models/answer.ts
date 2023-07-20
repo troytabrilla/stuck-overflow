@@ -36,6 +36,27 @@ export const validator = joi.object<IAnswer>({
     user: userValidator,
 })
 
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *      CreateAnswerInput:
+ *          type: object
+ *          properties:
+ *              body:
+ *                  type: string
+ *                  default: This is an answer.
+ *              user_id:
+ *                  type: integer
+ *                  default: 14531062
+ *              question_id:
+ *                  type: integer
+ *                  default: 68462550
+ *          required:
+ *              - body
+ *              - user_id
+ *              - question_id
+ */
 class Answer implements IAnswer {
     id: number
     body: string

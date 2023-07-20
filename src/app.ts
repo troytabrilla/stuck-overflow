@@ -4,6 +4,8 @@ import morgan from "morgan"
 import bodyParser from "body-parser"
 
 import v1Router from "./routers/v1.js"
+import apiDocs from "./docs/swagger.js"
+
 import apiErrorHandler from "./controllers/lib/api-error-handler.js"
 
 const app = express()
@@ -16,6 +18,8 @@ app.use(bodyParser.json())
 // other third party auth service, but for this challenge, I decided to omit this functionality, because it can take some
 // time to get just right.
 app.use("/api/v1", v1Router)
+
+apiDocs(app)
 
 app.use(apiErrorHandler)
 
