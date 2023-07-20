@@ -2,7 +2,7 @@ import joi from "joi"
 
 import validate from "./lib/validate.js"
 import postgres from "../db/postgres.js"
-import fetchAllUsers from "../queries/fetch-all-users.js"
+import fetchUser from "../queries/users/fetch-user.js"
 
 interface IUser {
     id: number
@@ -36,14 +36,14 @@ class User implements IUser {
         return new User(validated)
     }
 
-    static async fetchAll() {
-        const results = await postgres.pool.query(fetchAllUsers().toString())
+    static async fetch(id: number) {
+        const results = await postgres.pool.query(fetchUser(id).toString())
 
-        if (results?.rows?.length > 0) {
-            return results.rows.map(User.build)
+        if (results?.rows[0]) {
+            return User.build(results.rows[0])
         }
 
-        return []
+        return null
     }
 }
 

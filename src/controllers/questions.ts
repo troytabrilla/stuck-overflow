@@ -6,6 +6,7 @@ import Answer from "../models/answer.js"
 import Comment from "../models/comment.js"
 import errorHandler from "./lib/error-handler.js"
 import NotFound from "./lib/errors/not-found.js"
+import processApiQuery from "./lib/process-api-query.js"
 
 export const fetch: RequestHandler = errorHandler(async (req, res) => {
     const id = parseId(req)
@@ -21,10 +22,18 @@ export const fetch: RequestHandler = errorHandler(async (req, res) => {
 })
 
 export const fetchAll: RequestHandler = errorHandler(async (req, res) => {
-    const questions = await Question.fetchAll()
+    const query = processApiQuery(req, ["id", "creation"])
+
+    const total = await Question.countAll()
+    const questions = await Question.fetchAll(query.paging, query.sorting)
 
     res.json({
         data: questions,
+        paging: {
+            ...query.paging,
+            ...query.sorting,
+            total,
+        },
     })
 })
 
@@ -42,12 +51,12 @@ export const fetchFull: RequestHandler = errorHandler(async (req, res) => {
 
     let answers: Answer[] = []
     if (question) {
-        answers = await Answer.fetchAllForQuestion(question.id)
+        answers = await Answer.fetchAllFor("questions", question.id)
     }
 
     let comments: Comment[] = []
     if (question) {
-        comments = await Comment.fetchAllForEntity("questions", question.id)
+        comments = await Comment.fetchAllFor("questions", question.id)
     }
 
     res.json({

@@ -3,7 +3,9 @@ import joi from "joi"
 import validate from "./lib/validate.js"
 import postgres from "../db/postgres.js"
 import User, { validator as userValidator } from "./user.js"
-import fetchAnswersForQuestions from "../queries/fetch-answers-for-question.js"
+import fetchAnswersFor, {
+    type AnswerEntities,
+} from "../queries/answers/fetch-answers-for.js"
 
 export interface IAnswer {
     id: number
@@ -61,9 +63,9 @@ class Answer implements IAnswer {
         return new Answer(validated)
     }
 
-    static async fetchAllForQuestion(question_id: number) {
+    static async fetchAllFor(entityName: AnswerEntities, entityId: number) {
         const results = await postgres.pool.query(
-            fetchAnswersForQuestions(question_id).toString()
+            fetchAnswersFor(entityName, entityId).toString()
         )
 
         if (results?.rows?.length > 0) {

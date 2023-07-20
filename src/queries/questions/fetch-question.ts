@@ -1,5 +1,5 @@
-import builder from "./lib/builder.js"
-import joinUsers from "./lib/join-users.js"
+import builder from "../lib/builder.js"
+import joinUsers from "../lib/join-users.js"
 
 const fetchQuestion = (id: number) => {
     let query = builder

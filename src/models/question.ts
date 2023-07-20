@@ -2,9 +2,15 @@ import joi from "joi"
 
 import validate from "./lib/validate.js"
 import postgres from "../db/postgres.js"
-import fetchQuestion from "../queries/fetch-question.js"
-import fetchAllQuestions from "../queries/fetch-all-questions.js"
+import fetchQuestion from "../queries/questions/fetch-question.js"
+import fetchAllQuestions from "../queries/questions/fetch-all-questions.js"
 import User, { validator as userValidator } from "./user.js"
+import type { Paging } from "../queries/lib/paging.js"
+import type { Sorting } from "../queries/lib/sorting.js"
+import countAllQuestions from "../queries/questions/count-all-questions.js"
+import fetchQuestionsFor, {
+    type QuestionEntities,
+} from "../queries/questions/fetch-questions-for.js"
 
 interface IQuestion {
     id: number
@@ -74,14 +80,38 @@ class Question implements IQuestion {
         return null
     }
 
-    static async fetchAll() {
+    static async fetchAll(paging?: Paging, sorting?: Sorting) {
         const results = await postgres.pool.query(
-            fetchAllQuestions().toString()
+            fetchAllQuestions(paging, sorting).toString()
         )
 
         if (results?.rows?.length > 0) {
             return results.rows.map(Question.build)
         }
+    }
+
+    static async countAll() {
+        const results = await postgres.pool.query(
+            countAllQuestions().toString()
+        )
+
+        if (results?.rows?.length > 0) {
+            return results.rows[0].count || 0
+        }
+
+        return 0
+    }
+
+    static async fetchAllFor(entityName: QuestionEntities, entityId: number) {
+        const results = await postgres.pool.query(
+            fetchQuestionsFor(entityName, entityId).toString()
+        )
+
+        if (results?.rows?.length > 0) {
+            return results.rows.map(Question.build)
+        }
+
+        return []
     }
 }
 

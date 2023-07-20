@@ -3,9 +3,9 @@ import joi from "joi"
 import validate from "./lib/validate.js"
 import postgres from "../db/postgres.js"
 import User, { validator as userValidator } from "./user.js"
-import fetchCommentsForEntity from "../queries/fetch-comments-for-entity.js"
+import fetchCommentsFor from "../queries/comments/fetch-comments-for.js"
 
-import type { CommentEntities } from "../queries/fetch-comments-for-entity.js"
+import type { CommentEntities } from "../queries/comments/fetch-comments-for.js"
 
 interface IComment {
     id: number
@@ -61,12 +61,9 @@ class Comment implements IComment {
         return new Comment(validated)
     }
 
-    static async fetchAllForEntity(
-        entityName: CommentEntities,
-        entityId: number
-    ) {
+    static async fetchAllFor(entityName: CommentEntities, entityId: number) {
         const results = await postgres.pool.query(
-            fetchCommentsForEntity(entityName, entityId).toString()
+            fetchCommentsFor(entityName, entityId).toString()
         )
 
         if (results?.rows?.length > 0) {
