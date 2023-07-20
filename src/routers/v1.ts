@@ -7,6 +7,8 @@ import comments from "../controllers/comments.js"
 
 const router = express.Router()
 
+// @note API documentation is very basic for this challenge. For production, would probably want to add more details.
+
 /**
  * @openapi
  * /answers:
