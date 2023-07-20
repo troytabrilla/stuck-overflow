@@ -61,6 +61,7 @@ class Comment implements IComment {
     body: string
     user_id: number
     user?: User | undefined
+    entity?: IEntity
 
     constructor(comment: IComment) {
         this.id = comment.id
@@ -82,13 +83,25 @@ class Comment implements IComment {
         return new Comment(validated)
     }
 
-    static async fetchAllFor(entityName: CommentEntities, entityId: number) {
+    static async fetchAllFor(
+        entityName: CommentEntities,
+        entityIds: number | number[]
+    ) {
         const results = await postgres.query(
-            fetchCommentsFor(entityName, entityId).toString()
+            fetchCommentsFor(entityName, entityIds).toString()
         )
 
         if (results.length) {
-            return results.map(Comment.build)
+            return results.map((comment) => {
+                const { entity_name, entity_id, ...rest } = comment
+                return {
+                    ...Comment.build(rest),
+                    entity: {
+                        entity_name,
+                        entity_id,
+                    },
+                }
+            })
         }
 
         return []

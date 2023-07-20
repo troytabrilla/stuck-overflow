@@ -2,7 +2,7 @@ import type { RequestHandler } from "express"
 
 import parseId from "./lib/parse-id.js"
 import Question from "../models/question.js"
-import Answer from "../models/answer.js"
+import Answer, { type IAnswer } from "../models/answer.js"
 import Comment from "../models/comment.js"
 import errorHandler from "./lib/error-handler.js"
 import NotFound from "./lib/errors/not-found.js"
@@ -49,21 +49,33 @@ export const fetchFull: RequestHandler = errorHandler(async (req, res) => {
         throw new NotFound("No question found.")
     }
 
-    let answers: Answer[] = []
-    if (question) {
-        answers = await Answer.fetchAllFor("questions", question.id)
-    }
+    const answers = await Answer.fetchAllFor("questions", question.id)
+    const commentsForAnswers = await Comment.fetchAllFor(
+        "answers",
+        answers.map((a) => a.id)
+    )
+    const commentAnswerMap = commentsForAnswers.reduce((acc, comment) => {
+        const { entity, ...rest } = comment
+        acc.set(entity.entity_id, acc.get(entity.entity_id) || [])
+        acc.get(entity.entity_id).push(comment)
+        return acc
+    }, new Map())
 
-    let comments: Comment[] = []
-    if (question) {
-        comments = await Comment.fetchAllFor("questions", question.id)
-    }
+    const commentsForQuestion = await Comment.fetchAllFor(
+        "questions",
+        question.id
+    )
 
     res.json({
         data: {
             ...question,
-            answers,
-            comments,
+            answers: answers.map((answer) => {
+                return {
+                    ...answer,
+                    comments: commentAnswerMap.get(answer.id),
+                }
+            }),
+            comments: commentsForQuestion,
         },
     })
 })

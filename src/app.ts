@@ -12,8 +12,9 @@ app.use(helmet())
 app.use(morgan("tiny"))
 app.use(bodyParser.json())
 
-// @note These routes should be authorized and authenticated. For production, you could use something like OAuth, but
-// for this challenge, I decided to omit this functionality.
+// @note These routes should be authorized and authenticated. For production, you could use something like OAuth or some
+// other third party auth service, but for this challenge, I decided to omit this functionality, because it can take some
+// time to get just right.
 app.use("/api/v1", router)
 
 app.use(apiErrorHandler)

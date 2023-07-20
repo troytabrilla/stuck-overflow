@@ -16,20 +16,9 @@ export const fetchFull: RequestHandler = errorHandler(async (req, res) => {
         throw new NotFound("No user found.")
     }
 
-    let questions: Question[] = []
-    if (user) {
-        questions = await Question.fetchAllFor("users", user.id)
-    }
-
-    let answers: Answer[] = []
-    if (user) {
-        answers = await Answer.fetchAllFor("users", user.id)
-    }
-
-    let comments: Comment[] = []
-    if (user) {
-        comments = await Comment.fetchAllFor("users", user.id)
-    }
+    const questions = await Question.fetchAllFor("users", user.id)
+    const answers = await Answer.fetchAllFor("users", user.id)
+    const comments = await Comment.fetchAllFor("users", user.id)
 
     res.json({
         data: {

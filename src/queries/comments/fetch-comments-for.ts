@@ -4,31 +4,46 @@ import joinUsers from "../lib/join-users.js"
 
 export type CommentEntities = "questions" | "answers" | "users"
 
-const fetchCommentsFor = (entityName: CommentEntities, entityId: number) => {
+const fetchCommentsFor = (
+    entityName: CommentEntities,
+    entityIds: number | number[]
+) => {
     let query = builder
         .select("comments.*")
         .from("comments")
         .groupBy("comments.id")
 
+    if (typeof entityIds === "number") {
+        entityIds = [entityIds]
+    }
+
     switch (entityName) {
         case "questions":
-            query.join(
-                "question_comments",
-                "comments.id",
-                "question_comments.comment_id"
-            )
-            query.where("question_comments.question_id", entityId)
+            query
+                .join(
+                    "question_comments",
+                    "comments.id",
+                    "question_comments.comment_id"
+                )
+                .select(builder.raw("'questions' AS entity_name"))
+                .select("question_comments.question_id AS entity_id")
+                .whereIn("question_comments.question_id", entityIds)
+                .groupBy("question_comments.question_id")
             break
         case "answers":
-            query.join(
-                "answer_comments",
-                "comments.id",
-                "answer_comments.comment_id"
-            )
-            query.where("answer_comments.answer_id", entityId)
+            query
+                .join(
+                    "answer_comments",
+                    "comments.id",
+                    "answer_comments.comment_id"
+                )
+                .select(builder.raw("'answers' AS entity_name"))
+                .select("answer_comments.answer_id AS entity_id")
+                .whereIn("answer_comments.answer_id", entityIds)
+                .groupBy("answer_comments.answer_id")
             break
         case "users":
-            query.where("comments.user_id", entityId)
+            query.whereIn("comments.user_id", entityIds)
             break
         default:
             throw new BadRequest("Invalid entity for comments.")
