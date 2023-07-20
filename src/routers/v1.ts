@@ -110,6 +110,8 @@ router.get("/questions", questions.fetchAll)
  *              description: Question with answers and comments was fetched successfully
  *          400:
  *              description: Question was not fetched due bad data
+ *          404:
+ *              description: Question was not found
  */
 router.get("/questions/:id/full", questions.fetchFull)
 
@@ -131,6 +133,8 @@ router.get("/questions/:id/full", questions.fetchFull)
  *              description: User with questions, answers, and comments was fetched successfully
  *          400:
  *              description: User was not fetched due bad data
+ *          404:
+ *              description: User was not found
  */
 router.get("/users/:id/full", users.fetchFull)
 

@@ -12,8 +12,9 @@ services:
     env_file:
       - .env.docker
     depends_on:
-      db:
-        condition: service_healthy
+      # Could change this to depend on test to prevent running if tests fail
+      migration:
+        condition: service_completed_successfully
   # @see https://github.com/felipewom/docker-compose-postgres
   db:
     image: postgres:15-bullseye
@@ -43,3 +44,17 @@ services:
     depends_on:
       db:
         condition: service_healthy
+  test:
+    build:
+      context: .
+    command:
+      [
+        "npm",
+        "run",
+        "test"
+      ]
+    env_file:
+      - .env.docker
+    depends_on:
+      migration:
+        condition: service_completed_successfully
