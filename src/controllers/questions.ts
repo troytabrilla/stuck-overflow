@@ -7,11 +7,32 @@ import Comment from "../models/comment.js"
 import errorHandler from "./lib/error-handler.js"
 import NotFound from "./lib/errors/not-found.js"
 
+export const fetch: RequestHandler = errorHandler(async (req, res) => {
+    const id = parseId(req)
+    const question = await Question.fetch(id)
+
+    if (!question) {
+        throw new NotFound("No question found.")
+    }
+
+    res.json({
+        data: question,
+    })
+})
+
+export const fetchAll: RequestHandler = errorHandler(async (req, res) => {
+    const questions = await Question.fetchAll()
+
+    res.json({
+        data: questions,
+    })
+})
+
 // @note Not using an ORM meant having to join data and manually populate nested objects, which was getting
 // hairy in the SQL queries, so I opted to fetch the data separately and join them in the application logic.
 // It simplifies the code at the cost of less performance due to sending multiple queries. If performance
 // becomes an issue, doing the joins in a single query and figuring out the nesting may be beneficial.
-export const fetch: RequestHandler = errorHandler(async (req, res) => {
+export const fetchFull: RequestHandler = errorHandler(async (req, res) => {
     const id = parseId(req)
     const question = await Question.fetch(id)
 
@@ -40,4 +61,6 @@ export const fetch: RequestHandler = errorHandler(async (req, res) => {
 
 export default {
     fetch,
+    fetchAll,
+    fetchFull,
 }

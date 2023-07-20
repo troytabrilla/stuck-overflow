@@ -18,7 +18,7 @@ export interface IAnswer {
 
 export const validator = joi.object<IAnswer>({
     id: joi.number().required(),
-    body: joi.string().min(2).max(5000).required(),
+    body: joi.string().min(2).required(),
     score: joi.number().required(),
     accepted: joi.boolean().required(),
     creation: joi.date().required(),
@@ -67,7 +67,7 @@ class Answer implements IAnswer {
         )
 
         if (results?.rows?.length > 0) {
-            return results.rows.map((answer: IAnswer) => Answer.build(answer))
+            return results.rows.map(Answer.build)
         }
 
         return []

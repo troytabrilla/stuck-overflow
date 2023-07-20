@@ -70,9 +70,7 @@ class Comment implements IComment {
         )
 
         if (results?.rows?.length > 0) {
-            return results.rows.map((comment: IComment) =>
-                Comment.build(comment)
-            )
+            return results.rows.map(Comment.build)
         }
 
         return []

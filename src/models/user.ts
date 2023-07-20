@@ -40,7 +40,7 @@ class User implements IUser {
         const results = await postgres.pool.query(fetchAllUsers().toString())
 
         if (results?.rows?.length > 0) {
-            return results.rows.map((user: IUser) => User.build(user))
+            return results.rows.map(User.build)
         }
 
         return []

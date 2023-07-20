@@ -3,6 +3,7 @@ import joi from "joi"
 import validate from "./lib/validate.js"
 import postgres from "../db/postgres.js"
 import fetchQuestion from "../queries/fetch-question.js"
+import fetchAllQuestions from "../queries/fetch-all-questions.js"
 import User, { validator as userValidator } from "./user.js"
 
 interface IQuestion {
@@ -18,7 +19,7 @@ interface IQuestion {
 const validator = joi.object<IQuestion>({
     id: joi.number().required(),
     title: joi.string().min(2).max(500).required(),
-    body: joi.string().min(2).max(5000).required(),
+    body: joi.string().min(2).required(),
     score: joi.number().required(),
     creation: joi.date().required(),
     user_id: joi.number().min(0).required(),
@@ -71,6 +72,16 @@ class Question implements IQuestion {
         }
 
         return null
+    }
+
+    static async fetchAll() {
+        const results = await postgres.pool.query(
+            fetchAllQuestions().toString()
+        )
+
+        if (results?.rows?.length > 0) {
+            return results.rows.map(Question.build)
+        }
     }
 }
 

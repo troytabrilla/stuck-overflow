@@ -5,13 +5,9 @@ import questions from "./controllers/questions.js"
 
 const router = express.Router()
 
-router.get("/", async (_req, res) => {
-    res.json({
-        data: "Hello, world",
-    })
-})
-
+router.get("/questions", questions.fetchAll)
 router.get("/questions/:id", questions.fetch)
+router.get("/questions/:id/full", questions.fetchFull)
 
 router.get("/users", users.fetchAll)
 
