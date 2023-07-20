@@ -73,7 +73,9 @@ const fetchAnswersForQuestion = async (question: Question) => {
 // @note Not using an ORM meant having to join data and manually populate deeply nested objects, which was getting
 // hairy in the SQL queries, so I opted to fetch the data separately and join them in the application logic.
 // It simplifies the code at the cost of less performance due to sending multiple queries. If performance
-// becomes an issue, doing the joins in a single query and figuring out the nesting may be beneficial.
+// becomes an issue, doing the joins in a single query and figuring out the nesting may be beneficial. Denormalizing
+// the user data into the questions, answers, and comments tables could be quite useful in that case by reducing the
+// amount of nesting by one level.
 export const fetchFull: RequestHandler = errorHandler(async (req, res) => {
     const id = parseId(req)
 

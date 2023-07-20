@@ -11,8 +11,8 @@ import NotFound from "./lib/errors/not-found.js"
 // Fetches all questions, answers, and comments for a given user
 export const fetchFull: RequestHandler = errorHandler(async (req, res) => {
     const id = parseId(req)
-    const user = await User.fetch(id)
 
+    const user = await User.fetch(id)
     if (!user) {
         throw new NotFound("No user found.")
     }
