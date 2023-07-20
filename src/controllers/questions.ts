@@ -56,7 +56,9 @@ export const fetchFull: RequestHandler = errorHandler(async (req, res) => {
     )
     const commentAnswerMap = commentsForAnswers.reduce((acc, comment) => {
         const { entity, ...rest } = comment
-        acc.set(entity.entity_id, acc.get(entity.entity_id) || [])
+        if (!acc.get(entity.entity_id)) {
+            acc.set(entity.entity_id, [])
+        }
         acc.get(entity.entity_id).push(comment)
         return acc
     }, new Map())

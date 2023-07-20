@@ -21,7 +21,6 @@ export const query = async (queryStr: string) => {
     return []
 }
 
-// @todo Add a query function that parses out rows
 export default {
     pool,
     query,

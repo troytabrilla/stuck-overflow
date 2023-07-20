@@ -1,9 +1,9 @@
 import express from "express"
 
-import answers from "./controllers/answers.js"
-import questions from "./controllers/questions.js"
-import users from "./controllers/users.js"
-import comments from "./controllers/comments.js"
+import answers from "../controllers/answers.js"
+import questions from "../controllers/questions.js"
+import users from "../controllers/users.js"
+import comments from "../controllers/comments.js"
 
 const router = express.Router()
 
