@@ -11,7 +11,7 @@
         "dev": "concurrently \"tsc -w\" \"nodemon -r dotenv/config dist/app.js -w dist\"",
         "predev": "npm run build",
         "start": "node dist/app.js",
-        "docker-clean": "rimraf db-data && docker rmi stuck-overflow-api:latest && docker rmi stuck-overflow-migration:latest",
+        "docker-clean": "rimraf db-data && docker rmi stuck-overflow-api:latest && docker rmi stuck-overflow-migration:latest && docker rmi stuck-overflow-test:latest",
         "docker-build": "docker build -t stuck-overflow-api:latest .",
         "docker-run": "docker run --rm -p 3000:3000 stuck-overflow-api:latest",
         "predocker-run": "npm run docker-build",
