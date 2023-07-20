@@ -13,7 +13,7 @@ const fetchAnswersFor = (entityName: AnswerEntities, entityId: number) => {
     switch (entityName) {
         case "questions":
             query.where("answers.question_id", entityId)
-            query = joinUsers(query, "comments")
+            query = joinUsers(query, "answers")
             break
         case "users":
             query.where("answers.user_id", entityId)

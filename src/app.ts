@@ -1,6 +1,7 @@
 import express from "express"
 import helmet from "helmet"
 import morgan from "morgan"
+import bodyParser from "body-parser"
 
 import router from "./router.js"
 import apiErrorHandler from "./controllers/lib/api-error-handler.js"
@@ -9,6 +10,7 @@ const app = express()
 
 app.use(helmet())
 app.use(morgan("tiny"))
+app.use(bodyParser.json())
 
 app.use("/api/v1", router)
 

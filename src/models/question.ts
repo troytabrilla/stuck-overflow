@@ -23,11 +23,11 @@ interface IQuestion {
 }
 
 const validator = joi.object<IQuestion>({
-    id: joi.number().required(),
+    id: joi.number(),
     title: joi.string().min(2).max(500).required(),
     body: joi.string().min(2).required(),
-    score: joi.number().required(),
-    creation: joi.date().required(),
+    score: joi.number(),
+    creation: joi.date(),
     user_id: joi.number().min(0).required(),
     user: userValidator,
 })

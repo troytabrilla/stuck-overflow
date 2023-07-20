@@ -29,7 +29,7 @@ interface IAnswerComment {
 }
 
 export const validator = joi.object<IComment>({
-    id: joi.number().required(),
+    id: joi.number(),
     body: joi.string().min(2).max(5000).required(),
     user_id: joi.number().min(0).required(),
     user: userValidator,

@@ -1,4 +1,5 @@
 import joi from "joi"
+import debug from "debug"
 
 import validate from "./lib/validate.js"
 import postgres from "../db/postgres.js"
@@ -6,6 +7,12 @@ import User, { validator as userValidator } from "./user.js"
 import fetchAnswersFor, {
     type AnswerEntities,
 } from "../queries/answers/fetch-answers-for.js"
+import fetchQuestion from "../queries/questions/fetch-question.js"
+import fetchUser from "../queries/users/fetch-user.js"
+import createAnswer from "../queries/answers/create-answer.js"
+import BadRequest from "../controllers/lib/errors/bad-request.js"
+
+const logger = debug("stuck-overflow:src:models:answer")
 
 export interface IAnswer {
     id: number
@@ -19,11 +26,11 @@ export interface IAnswer {
 }
 
 export const validator = joi.object<IAnswer>({
-    id: joi.number().required(),
+    id: joi.number(),
     body: joi.string().min(2).required(),
-    score: joi.number().required(),
-    accepted: joi.boolean().required(),
-    creation: joi.date().required(),
+    score: joi.number(),
+    accepted: joi.boolean(),
+    creation: joi.date(),
     user_id: joi.number().min(0).required(),
     question_id: joi.number().min(0).required(),
     user: userValidator,
@@ -73,6 +80,36 @@ class Answer implements IAnswer {
         }
 
         return []
+    }
+
+    static async create(answer: IAnswer) {
+        const defaults = {
+            score: 0,
+            accepted: false,
+            creation: new Date(),
+        }
+
+        const validated = this.validate({ ...defaults, ...answer })
+
+        const question = fetchQuestion(answer.question_id)
+        if (!question) {
+            logger("No question found for answer.")
+            throw new BadRequest("No question to answer.")
+        }
+
+        const user = fetchUser(answer.user_id)
+        if (!user) {
+            logger("No user found for answer.")
+            throw new BadRequest("No user for answer.")
+        }
+
+        const results = await postgres.pool.query(
+            createAnswer(validated).toString()
+        )
+
+        logger(results?.rows)
+
+        return validated
     }
 }
 

@@ -10,7 +10,7 @@ interface IUser {
 }
 
 export const validator = joi.object<IUser>({
-    id: joi.number().required(),
+    id: joi.number(),
     name: joi.string().min(2).max(100).required(),
 })
 
