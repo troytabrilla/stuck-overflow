@@ -1,3 +1,7 @@
 db-data
 dist
 node_modules
+/test-results/
+/test-examples/
+/playwright-report/
+/playwright/.cache/
