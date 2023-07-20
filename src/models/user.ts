@@ -1,8 +1,12 @@
 import joi from "joi"
+import debug from "debug"
 
 import validate from "./lib/validate.js"
 import postgres from "../db/postgres.js"
 import fetchUser from "../queries/users/fetch-user.js"
+import BadRequest from "../controllers/lib/errors/bad-request.js"
+
+const logger = debug("stuck-overflow:src:models:user")
 
 interface IUser {
     id: number
@@ -28,7 +32,12 @@ class User implements IUser {
     }
 
     static validate(user: IUser) {
-        return validate(user, validator)
+        try {
+            return validate(user, validator)
+        } catch (err) {
+            logger(err)
+            throw new BadRequest("Invalid question.")
+        }
     }
 
     static build(user: IUser) {

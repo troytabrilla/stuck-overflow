@@ -47,7 +47,7 @@ export const validator = joi.object<IComment>({
 })
 
 interface IEntity {
-    entity_name: string
+    entity_name: CommentableEntities
     entity_id: number
 }
 
@@ -71,7 +71,12 @@ class Comment implements IComment {
     }
 
     static validate(comment: IComment) {
-        return validate(comment, validator)
+        try {
+            return validate(comment, validator)
+        } catch (err) {
+            logger(err)
+            throw new BadRequest("Invalid comment.")
+        }
     }
 
     static build(comment: IComment) {
@@ -107,32 +112,24 @@ class Comment implements IComment {
         return []
     }
 
-    static async createFor(
-        comment: IComment,
+    private static async validateEntity(
         entityName: CommentableEntities,
         entityId: number
     ) {
-        let validated: IComment
-        try {
-            validated = this.validate(comment)
-        } catch (err) {
-            logger(err)
-            throw new BadRequest("Invalid comment.")
-        }
-
-        const { value: entity, error } = entityValidator.validate({
+        const { value, error } = entityValidator.validate({
             entity_name: entityName,
             entity_id: entityId,
         })
+
         if (error) {
             logger(error)
             throw new BadRequest("Invalid entity for comment.")
         }
 
-        switch (entity.entity_name) {
+        switch (value.entity_name) {
             case "questions":
                 const question = await postgres.query(
-                    fetchQuestion(entity.entity_id).toString()
+                    fetchQuestion(value.entity_id).toString()
                 )
                 if (!question.length) {
                     logger("No question found for comment.")
@@ -141,7 +138,7 @@ class Comment implements IComment {
                 break
             case "answers":
                 const answer = await postgres.query(
-                    fetchAnswer(entity.entity_id).toString()
+                    fetchAnswer(value.entity_id).toString()
                 )
                 if (!answer.length) {
                     logger("No answer found for comment.")
@@ -149,39 +146,76 @@ class Comment implements IComment {
                 }
                 break
             default:
-                logger(`${entity.entity_name} is not valid.`)
+                logger(`${value.entity_name} is not valid.`)
                 throw new BadRequest("Invalid entity for comments.")
         }
 
+        return value
+    }
+
+    private static async validateUser(comment: IComment) {
         const user = await postgres.query(fetchUser(comment.user_id).toString())
+
         if (!user.length) {
             logger("No user found for comment.")
             throw new BadRequest("No user for comment.")
         }
+    }
 
+    private static async saveComment(validated: IComment, entity: IEntity) {
         const client = await postgres.pool.connect()
-        let final: IComment
+
+        let comment: IComment
         try {
             await client.query("BEGIN")
+
+            // Save comment row
             const results = await client.query(
                 createComment(validated).toString()
             )
-            const id = results?.rows[0]?.id
-            final = { ...validated, id }
+
+            if (!results?.rows?.length) {
+                const message = "Could not create comment."
+
+                logger(message)
+
+                throw new Error(message)
+            }
+
+            const id = results.rows[0].id
+            comment = { ...validated, id }
+
+            // Save junction table row
             await client.query(
-                createCommentFor(final, entityName, entityId).toString()
+                createCommentFor(
+                    comment,
+                    entity.entity_name,
+                    entity.entity_id
+                ).toString()
             )
+
             await client.query("COMMIT")
-            logger(`Committed queries`)
         } catch (err) {
             await client.query("ROLLBACK")
-            logger(`Rolled back queries`)
             throw err
         } finally {
             await client.release()
         }
 
-        return final
+        return comment
+    }
+
+    static async createFor(
+        comment: IComment,
+        entityName: CommentableEntities,
+        entityId: number
+    ) {
+        const validated = this.validate(comment)
+
+        const entity = await this.validateEntity(entityName, entityId)
+        await this.validateUser(comment)
+
+        return await this.saveComment(validated, entity)
     }
 }
 

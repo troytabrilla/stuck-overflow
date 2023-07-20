@@ -1,4 +1,5 @@
 import joi from "joi"
+import debug from "debug"
 
 import validate from "./lib/validate.js"
 import postgres from "../db/postgres.js"
@@ -11,6 +12,9 @@ import countAllQuestions from "../queries/questions/count-all-questions.js"
 import fetchQuestionsFor, {
     type QuestionEntities,
 } from "../queries/questions/fetch-questions-for.js"
+import BadRequest from "../controllers/lib/errors/bad-request.js"
+
+const logger = debug("stuck-overflow:src:models:question")
 
 interface IQuestion {
     id: number
@@ -58,7 +62,12 @@ class Question implements IQuestion {
     }
 
     static validate(question: IQuestion) {
-        return validate(question, validator)
+        try {
+            return validate(question, validator)
+        } catch (err) {
+            logger(err)
+            throw new BadRequest("Invalid question.")
+        }
     }
 
     static build(question: IQuestion) {
@@ -85,19 +94,13 @@ class Question implements IQuestion {
             fetchAllQuestions(paging, sorting).toString()
         )
 
-        if (results.length) {
-            return results.map(Question.build)
-        }
+        return results.map(Question.build)
     }
 
     static async countAll() {
         const results = await postgres.query(countAllQuestions().toString())
 
-        if (results.length) {
-            return results[0].count || 0
-        }
-
-        return 0
+        return results[0]?.count || 0
     }
 
     static async fetchAllFor(entityName: QuestionEntities, entityId: number) {
@@ -105,11 +108,7 @@ class Question implements IQuestion {
             fetchQuestionsFor(entityName, entityId).toString()
         )
 
-        if (results.length > 0) {
-            return results.map(Question.build)
-        }
-
-        return []
+        return results.map(Question.build)
     }
 }
 

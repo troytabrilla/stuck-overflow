@@ -58,7 +58,12 @@ class Answer implements IAnswer {
     }
 
     static validate(answer: IAnswer) {
-        return validate(answer, validator)
+        try {
+            return validate(answer, validator)
+        } catch (err) {
+            logger(err)
+            throw new BadRequest("Invalid answer.")
+        }
     }
 
     static build(answer: IAnswer) {
@@ -67,6 +72,7 @@ class Answer implements IAnswer {
         }
 
         const validated = Answer.validate(answer)
+
         return new Answer(validated)
     }
 
@@ -75,45 +81,41 @@ class Answer implements IAnswer {
             fetchAnswersFor(entityName, entityId).toString()
         )
 
-        if (results.length) {
-            return results.map(Answer.build)
-        }
+        return results.map(Answer.build)
+    }
 
-        return []
+    private static async validateQuestionForAnswer(answer: IAnswer) {
+        const question = await postgres.query(
+            fetchQuestion(answer.question_id).toString()
+        )
+
+        if (!question.length) {
+            logger("No question found for answer.")
+            throw new BadRequest("No question to answer.")
+        }
+    }
+
+    private static async validateUserForAnswer(answer: IAnswer) {
+        const user = await postgres.query(fetchUser(answer.user_id).toString())
+
+        if (!user.length) {
+            logger("No user found for answer.")
+            throw new BadRequest("No user for answer.")
+        }
     }
 
     static async create(answer: IAnswer) {
+        await this.validateQuestionForAnswer(answer)
+        await this.validateUserForAnswer(answer)
+
         const defaults = {
             score: 0,
             accepted: false,
             creation: new Date(),
         }
 
-        let validated: IAnswer
-        try {
-            validated = this.validate({ ...defaults, ...answer })
-        } catch (err) {
-            logger(err)
-            throw new BadRequest("Invalid answer.")
-        }
-
-        const question = await postgres.query(
-            fetchQuestion(answer.question_id).toString()
-        )
-        if (!question.length) {
-            logger("No question found for answer.")
-            throw new BadRequest("No question to answer.")
-        }
-
-        const user = await postgres.query(fetchUser(answer.user_id).toString())
-        if (!user.length) {
-            logger("No user found for answer.")
-            throw new BadRequest("No user for answer.")
-        }
-
+        const validated = this.validate({ ...defaults, ...answer })
         const results = await postgres.query(createAnswer(validated).toString())
-
-        logger(results)
 
         return {
             ...validated,
