@@ -126,9 +126,6 @@ class Answer implements IAnswer {
     }
 
     static async create(answer: IAnswer) {
-        await this.validateQuestionForAnswer(answer)
-        await this.validateUserForAnswer(answer)
-
         const defaults = {
             score: 0,
             accepted: false,
@@ -136,6 +133,9 @@ class Answer implements IAnswer {
         }
 
         const validated = this.validate({ ...defaults, ...answer })
+        await this.validateQuestionForAnswer(answer)
+        await this.validateUserForAnswer(answer)
+
         const results = await postgres.query(createAnswer(validated).toString())
 
         return {

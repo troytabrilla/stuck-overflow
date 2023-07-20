@@ -14,6 +14,11 @@ app.use(helmet())
 app.use(morgan("tiny"))
 app.use(bodyParser.json())
 
+// Playwright pings the root endpoint as a sort of health check, so just send a 200 back.
+app.get("/", (_req, res) => {
+    res.status(200).send("OK")
+})
+
 // @note These routes should be authorized and authenticated. For production, you could use something like OAuth or some
 // other third party auth service, but for this challenge, I decided to omit this functionality, because it can take some
 // time to get just right.

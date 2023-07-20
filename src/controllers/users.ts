@@ -5,7 +5,7 @@ import User from "../models/user.js"
 import Question from "../models/question.js"
 import Answer from "../models/answer.js"
 import Comment from "../models/comment.js"
-import errorHandler from "./lib/error-handler.js"
+import errorHandler from "./lib/middleware-error-handler.js"
 import NotFound from "./lib/errors/not-found.js"
 
 // Fetches all questions, answers, and comments for a given user

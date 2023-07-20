@@ -88,7 +88,7 @@ router.post("/comments", comments.create)
  *          200:
  *              description: List of questions was fetched successfully
  *          400:
- *              description: List of questions was not fetched due bad data
+ *              description: List of questions was not fetched due invalid input
  */
 router.get("/questions", questions.fetchAll)
 

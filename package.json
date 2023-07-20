@@ -17,11 +17,13 @@
         "predocker-run": "npm run docker-build",
         "setup-db": "node -r dotenv/config tools/run-migrations.js && node -r dotenv/config tools/seed-database.js",
         "presetup-db": "npm run build",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "npx playwright test",
+        "pretest": "npm run build"
     },
     "author": "",
     "license": "ISC",
     "devDependencies": {
+        "@playwright/test": "^1.36.1",
         "@types/debug": "^4.1.8",
         "@types/express": "^4.17.17",
         "@types/morgan": "^1.9.4",

@@ -31,7 +31,7 @@ const processApiQuery = (req: Request, validSortKeys: string[]): ApiQuery => {
 
     if (error) {
         logger(error)
-        throw new BadRequest("Invalid API query")
+        throw new BadRequest("Invalid API query.")
     }
 
     const query: ApiQuery = {}

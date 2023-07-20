@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express"
 
 import Comment from "../models/comment.js"
-import errorHandler from "./lib/error-handler.js"
+import errorHandler from "./lib/middleware-error-handler.js"
 
 export const create: RequestHandler = errorHandler(async (req, res) => {
     const { entity_name, entity_id, ...body } = req.body

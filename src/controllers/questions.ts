@@ -4,22 +4,9 @@ import parseId from "./lib/parse-id.js"
 import Question from "../models/question.js"
 import Answer from "../models/answer.js"
 import Comment from "../models/comment.js"
-import errorHandler from "./lib/error-handler.js"
+import errorHandler from "./lib/middleware-error-handler.js"
 import NotFound from "./lib/errors/not-found.js"
 import processApiQuery from "./lib/process-api-query.js"
-
-export const fetch: RequestHandler = errorHandler(async (req, res) => {
-    const id = parseId(req)
-    const question = await Question.fetch(id)
-
-    if (!question) {
-        throw new NotFound("No question found.")
-    }
-
-    res.json({
-        data: question,
-    })
-})
 
 export const fetchAll: RequestHandler = errorHandler(async (req, res) => {
     const query = processApiQuery(req, ["id", "creation"])
@@ -32,7 +19,7 @@ export const fetchAll: RequestHandler = errorHandler(async (req, res) => {
         paging: {
             ...query.paging,
             ...query.sorting,
-            total,
+            total: typeof total === "number" ? total : parseInt(total, 10),
         },
     })
 })
